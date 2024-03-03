@@ -4,19 +4,25 @@ import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 import { useNavigate } from 'react-router-dom'
+import { useStore } from './stores/stores'
 
 const KEY_SAVE_NUMBER = 'KEY_SAVE_NUMBER';
 
 function App() {
-  const [count, setCount] = useState<number>(0)
+  const count = useStore(state => state.bears);
+  const setCount = useStore(state => state.updateBears);
+  const addOne = useStore(state => state.increasePopulation);
+  const removeAll = useStore(state => state.removeAllBears);
   const [histroyList, setHistoryList] = useState<number[]>([]);
   const navigate = useNavigate();
+
   const handleSave = useCallback(() => {
     localStorage.setItem(KEY_SAVE_NUMBER, count.toString());
     histroyList.push(count);
     setHistoryList([...histroyList]);
   }, [count, histroyList]);
   const renderdRef = useRef(false);
+
   useEffect(() => {
     if (renderdRef.current) return;
     renderdRef.current = true;
@@ -25,6 +31,7 @@ function App() {
     console.debug('saved number', savedNumber);
     setCount(savedNumber);
   }, []);
+
   return (
     <>
       <div>
@@ -38,10 +45,10 @@ function App() {
       <h1>Vite + React</h1>
       <div className="card">
         <Space direction='vertical'>
-          <Button type='primary' onClick={() => setCount((count) => count + 1)}>
+          <Button type='primary' onClick={addOne}>
             count is {count}
           </Button>
-          <Button type='primary' danger onClick={() => setCount(0)}>
+          <Button type='primary' danger onClick={removeAll}>
             Reset
           </Button>
           <Button danger onClick={handleSave}>
